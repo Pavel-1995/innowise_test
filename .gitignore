@@ -1,0 +1,9 @@
+.env
+.app
+*.pyc
+*.dir
+*.dat
+*.bak
+.idea
+**/__pycache__
+/env

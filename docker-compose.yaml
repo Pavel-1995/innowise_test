@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  # postgres db
+  db:
+    image: postgres:14.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+  # django web
+  web:
+    build: .
+    command: bash /innowise/entrypoint.sh
+    volumes:
+      - .:/innowise
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+  # redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: redis-server
+  # celery
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery
+    volumes:
+      - .:/innowise
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    command: celery -A innowise worker -l info
+
+volumes:
+  postgres_data:
